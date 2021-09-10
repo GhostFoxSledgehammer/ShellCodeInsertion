@@ -1,0 +1,37 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'application'
+
+
+mainClassName = 'ShellCodeInsertion.ShellCodeInjection'
+
+
+configurations {
+  // configuration that holds jars to include in the jar
+  extraLibs
+}
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+  extraLibs group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
+  extraLibs group: 'net.java.dev.jna', name: 'jna-platform', version: '5.2.0'
+  testImplementation     'junit:junit:4.13'
+  configurations.compile.extendsFrom(configurations.extraLibs)
+}
+jar {
+  manifest {
+    attributes(
+      'Main-Class': "$mainClassName"
+    )
+  }
+
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
